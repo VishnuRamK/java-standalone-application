@@ -1,28 +1,39 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'JDK17'
-        maven 'Maven3'
-    }
-
     stages {
-        stage('Checkout') {
-            // write your logic here
-        }
-        stage('Build') {
-            // write your logic here
-        }
-        stage('Run Application') {
-            // write your logic here
-        }
-        stage('Test') {
-            // write your logic here
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
+        stage('Checkout')
+        {
+
+           steps {
+                   checkout scm
                 }
-            }
+        }
+
+        stage('Build')
+        {
+            steps {
+                    dir('java-standalone-application'){
+                    bat 'mvn -B clean install'
+                    }
+
+                 }
+        }
+
+        stage('Test')
+        {
+           steps {
+                    dir('java-standalone-application'){
+                       bat 'mvn -B test'
+                   }
+                }
+        }
+
+        stage('Publish Test Results')
+        {
+             steps {
+                       junit 'java-standalone-application/target/surefire-reports/*.xml'
+                    }
         }
     }
 }
